@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galeri Foto ✨</title>
+  
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(-45deg, #ee7752, #e73c7e, #23a6d5, #23d5ab);
+      background-size: 400% 400%;
+      animation: gradientShift 15s ease infinite;
+      min-height: 100vh;
+      color: #fff;
+      padding: 20px;
+    }
+
+    @keyframes gradientShift {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 3.5rem;
+      margin: 30px 0;
+      text-shadow: 3px 3px 6px rgba(0,0,0,0.3);
+      animation: bounceIn 0.8s ease;
+    }
+
+    @keyframes bounceIn {
+      0% { transform: scale(0.3); opacity: 0; }
+      50% { transform: scale(1.05); }
+      70% { transform: scale(0.9); }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .upload-section {
+      background: rgba(255, 255, 255, 0.15);
+      backdrop-filter: blur(10px);
+      border-radius: 30px;
+      padding: 40px;
+      margin: 30px auto;
+      max-width: 600px;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.2);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      transition: transform 0.3s ease;
+    }
+
+    .upload-section:hover {
+      transform: translateY(-5px);
+    }
+
+    .upload-area {
+      border: 3px dashed rgba(255, 255, 255, 0.5);
+      border-radius: 20px;
+      padding: 50px 30px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      background: rgba(255, 255, 255, 0.05);
+    }
+
+    .upload-area:hover {
+      border-color: #fff;
+      background: rgba(255, 255, 255, 0.1);
+      transform: scale(1.02);
+    }
+
+    .upload-area.dragover {
+      border-color: #ffeb3b;
+      background: rgba(255, 235, 59, 0.2);
+      transform: scale(1.05);
+    }
+
+    .upload-icon {
+      font-size: 4rem;
+      margin-bottom: 15px;
+      animation: bounce 2s infinite;
+    }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .upload-text {
+      font-size: 1.3rem;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+
+    .upload-subtext {
+      font-size: 0.9rem;
+      opacity: 0.8;
+    }
+
+    .upload-btn {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border: none;
+      padding: 15px 50px;
+      font-size: 1.2rem;
+      border-radius: 50px;
+      cursor: pointer;
+      margin-top: 20px;
+      font-weight: bold;
+      box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+      transition: all 0.3s ease;
+      display: none;
+    }
+
+    .upload-btn:hover {
+      transform: translateY(-3px) scale(1.05);
+      box-shadow: 0 8px 25px rgba(102, 126, 234, 0.6);
+    }
+
+    .upload-btn:active {
+      transform: translateY(-1px);
+    }
+
+    .upload-btn.show {
+      display: inline-block;
+      animation: slideUp 0.4s ease;
+    }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .selected-file {
+      margin-top: 15px;
+      padding: 10px 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 15px;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .selected-file.show {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 25px;
+      padding: 20px 0;
+      margin-top: 40px;
+    }
+
+    .photo-card {
+      position: relative;
+      border-radius: 25px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+      animation: photoAppear 0.5s ease backwards;
+    }
+
+    @keyframes photoAppear {
+      from {
+        opacity: 0;
+        transform: scale(0.8) rotateZ(-5deg);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) rotateZ(0deg);
+      }
+    }
+
+    .photo-card:hover {
+      transform: rotate(3deg) scale(1.08);
+      box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+      z-index: 10;
+    }
+
+    .photo-card img {
+      width: 100%;
+      height: 320px;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.4s ease;
+    }
+
+    .photo-card:hover img {
+      transform: scale(1.1);
+    }
+
+    .photo-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+      padding: 20px;
+      transform: translateY(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .photo-card:hover .photo-overlay {
+      transform: translateY(0);
+    }
+
+    .photo-actions {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+
+    .action-btn {
+      background: rgba(255, 255, 255, 0.3);
+      border: none;
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      cursor: pointer;
+      font-size: 1.2rem;
+      transition: all 0.3s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .action-btn:hover {
+      background: rgba(255, 255, 255, 0.5);
+      transform: scale(1.15) rotate(10deg);
+    }
+
+    .loading {
+      text-align: center;
+      padding: 50px;
+      font-size: 1.5rem;
+      animation: pulse 1.5s ease infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 100px 20px;
+      font-size: 1.5rem;
+      opacity: 0.7;
+    }
+
+    .empty-state-icon {
+      font-size: 5rem;
+      margin-bottom: 20px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+
+    .notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      padding: 20px 30px;
+      border-radius: 15px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+      z-index: 1000;
+      animation: slideInRight 0.4s ease;
+      max-width: 350px;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(400px);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    .notification.success {
+      border-left: 5px solid #4caf50;
+    }
+
+    .notification.error {
+      border-left: 5px solid #f44336;
+    }
+
+    @media (max-width: 768px) {
+      h1 { font-size: 2.5rem; }
+      .gallery { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+      .photo-card img { height: 200px; }
+      .upload-section { padding: 25px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>✨ Galeri Foto ✨</h1>
+    
+    <div class="upload-section">
+      <div class="upload-area" id="uploadArea">
+        <div class="upload-icon">📸</div>
+        <div class="upload-text">Klik atau Drop Foto Di Sini</div>
+        <div class="upload-subtext">Pilih foto terbaik Anda!</div>
+        <input type="file" id="fileInput" accept="image/*" />
+      </div>
+      <div class="selected-file" id="selectedFile"></div>
+      <button class="upload-btn" id="uploadBtn">🚀 Upload Sekarang!</button>
+    </div>
+
+    <div id="galleryContainer">
+      <div class="loading">⏳ Memuat galeri...</div>
+    </div>
+  </div>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script src="script.js"></script> 
+</body>
+</html>
